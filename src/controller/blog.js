@@ -1,4 +1,5 @@
-const { exec } = require('../db/mysql')
+const { exec } = require('../db/mysql');
+const xss = require('xss');
 
 const getList = (author, keyword) => {
   // author 和 keyword 不一定存在  所以加个 where 1=1 保证拼接后语法不会错
@@ -24,9 +25,9 @@ const getDatail = (id) => {
 
 
 const newBlog = (blogData = {}) => {
-  const title = blogData.title;
-  const content = blogData.content;
-  const author = blogData.author;
+  const title = xss(blogData.title);
+  const content = xss(blogData.content);
+  const author = xss(blogData.author);
   const createtime = Date.now();
 
   const sql = `
