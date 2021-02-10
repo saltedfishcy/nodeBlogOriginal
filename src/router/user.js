@@ -12,11 +12,11 @@ const handleUserRouter = (req,res) => {
         // 设置session
         req.session.username = data.username;
         req.session.realname = data.realname;
-        console.log('sess', req.session)
+        // 同步到 redis
+        set(req.sessionId, req.session)
         return new SuccessModel()
-      }else {
-        return new ErrorModel()
       }
+        return new ErrorModel('登录失败')
     })
   }
 }
