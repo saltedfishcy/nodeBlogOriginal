@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');   // 处理日志
+var fs = require('fs');
 const session = require('express-session');
 const redisStore = require('connect-redis')(session);
 
@@ -10,14 +11,26 @@ const redisStore = require('connect-redis')(session);
 // var usersRouter = require('./routes/users');
 const blogRouter = require('./routes/blog');
 const userRouter = require('./routes/user');
+const ENV = process.env.NODE_ENV;
 
 var app = express();
 
 // // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'jade');
+if(ENV!=='dev') {
+  app.use(logger('dev'));
+} else {
+  const logFileName = path.join(__dirname, 'logs', 'access.log');
+  const writeStream = fs.createWriteStream(logFileName, {
+    flage: 'a'
+  })
+  app.use(logger('combined', {
+    stream: writeStream
+  }));
+}
 
-app.use(logger('dev'));
+
 app.use(express.json());  // 处理post请求数据
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
