@@ -10,6 +10,9 @@ const index = require('./routes/index')
 const users = require('./routes/users')
 const blog = require('./routes/blog')
 const user = require('./routes/user')
+const session = require('koa-generic-session')
+const redusStore = require('koa-redis')
+const { REDIS_CONF } = require('./conf/db')
 
 // error handler
 onerror(app)
@@ -33,6 +36,22 @@ app.use(async (ctx, next) => {
   const ms = new Date() - start
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
+
+// session 配置
+app.keys = ['WJiol#23123_'];
+app.use(session({
+  // 配置 cookie
+  cookie: {
+    path: '/',
+    heepOnly: true,
+    maxAge: 24 * 60 * 60 * 1000
+  },
+  store: redusStore({
+    // all: '127.0.0.1: 6379'
+    all: `${REDIS_CONF.host}:${REDIS_CONF.port}`
+  })
+}
+))
 
 // routes
 app.use(index.routes(), index.allowedMethods())
