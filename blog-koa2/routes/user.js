@@ -7,7 +7,6 @@ router.prefix('/api/user')
 router.post('/login', async function (ctx, next) {
   const { username, password } = ctx.request.body;
   const data = await login(username, password);
-  console.log('ctx.request.body', ctx.request.body)
   if(data.username) {
     // 设置session
     ctx.session.username = data.username;

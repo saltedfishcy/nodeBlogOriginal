@@ -5,6 +5,9 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
+const path = require('path')
+const fs = require('fs')
+const morgan = require('koa-morgan')
 
 const index = require('./routes/index')
 const users = require('./routes/users')
@@ -36,6 +39,20 @@ app.use(async (ctx, next) => {
   const ms = new Date() - start
   console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
+
+const ENV = process.env.NODE_ENV;
+// 本地 ENV!=='dev' 会产生记录
+if(ENV!=='production') {
+  app.use(morgan('dev'));
+} else {
+  const logFileName = path.join(__dirname, 'logs', 'access.log');
+  const writeStream = fs.createWriteStream(logFileName, {
+    flage: 'a'
+  })
+  app.use(morgan('combined', {
+    stream: writeStream
+  }));
+}
 
 // session 配置
 app.keys = ['WJiol#23123_'];
